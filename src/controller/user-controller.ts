@@ -1,4 +1,7 @@
+import { setError } from "../models/error-model";
 import { User } from "../models/user-model"
+import { errBadRequest, errNotFound, errUserExists } from "../utils/error";
+import { validateEmail, validateInput } from "../utils/validate";
 
 export default class UserController {
    private dataUser: User[]
@@ -19,24 +22,38 @@ export default class UserController {
             if(user) {
                 resolve(user);
             } else {
-                reject(`User with ${id} does not exist`);
+                reject(setError(errNotFound,`User with ${id} does not exist`));
             }
          });
     }
 
     public CreateUser(user : User) {
         return new Promise((resolve, reject) => {
+            
+            const checkInput = validateInput(user);
+            const checkEmail = validateEmail(user.email)
+
+            if(typeof checkInput === 'string') {
+               return reject(setError(errBadRequest, "Field can't be empty"));
+            }
+
+            if(!checkEmail) {
+              return reject(setError(errBadRequest, "Email is not valid"));
+            }
+
             const exitedUser = this.dataUser.find((data) => data.email === user.email);
 
             if (exitedUser) {
-                return reject(`User with ${exitedUser.email} already exists`);
+                return reject(setError(errUserExists,`User with ${exitedUser.email} already exists`));
             } 
+            
                 const data = {
                     id: (this.dataUser.at(-1)?.id || 0) + 1,
                     name: user.name,
                     email: user.email,
                     birthDate: user.birthDate
                 }
+
                 this.dataUser.push(data);
                 return resolve(data);
             
@@ -47,8 +64,20 @@ export default class UserController {
         return new Promise((resolve, reject) => {
             const user = this.dataUser.find((data) => data.id === parseInt(id));
 
+            const checkInput = validateInput(data);
+            const checkEmail = validateEmail(data.email)
+
+            if(typeof checkInput === 'string') {
+               return reject(setError(errBadRequest, "Field can't be empty"));
+            }
+
+            if(!checkEmail) {
+              return reject(setError(errBadRequest, "Email is not valid"));
+            }
+
+
             if (!user) {
-                reject("User not exits");
+                reject(setError(errNotFound, "User not found"));
             } else {
                 user.name = data.name; 
                 user.email = data.email;
@@ -64,7 +93,7 @@ export default class UserController {
             const exitedUser = this.dataUser.find((data) => data.id === parseInt(id));
             
             if(!exitedUser) {
-                return reject("User not exits");
+                return reject(setError(errNotFound, "User not found"));
             }
             
             const data = this.dataUser.filter((data) => data.id !== parseInt(id));

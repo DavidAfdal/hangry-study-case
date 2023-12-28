@@ -3,6 +3,9 @@ import UserController from "./controller/user-controller";
 import ApiRespone from "./utils/api-respon";
 import { GetReqBody } from "./utils/request-body";
 import { DataUser } from "./data";
+import { User } from "./models/user-model";
+import { Error } from "./models/error-model";
+import { errBadRequest, errNotFound, errUserExists } from "./utils/error";
 
 
 const userController = new UserController(DataUser);
@@ -24,8 +27,17 @@ const server = http.createServer(async (req:http.IncomingMessage, res:http.Serve
 
         res.end(JSON.stringify(ApiRespone.StatusSuccessWithData("Succes get data user by id", user)));
         } catch (error) {
-            res.writeHead(404, {"Content-Type": "application/json"})
-            res.end(JSON.stringify(ApiRespone.StatusError(error as string))); 
+            const err = error as Error;
+            if(err.error === errBadRequest) {
+                res.writeHead(400, {"Content-Type": "application/json"})
+                return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+            } else if(err.error === errNotFound) {
+                res.writeHead(404, {"Content-Type": "application/json"})
+                return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+            } else if(err.error === errUserExists) {
+                res.writeHead(200, {"Content-Type": "application/json"})
+                return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+            }
         }
     } 
     // api for update user by id "http://localhost:5000/api/users/1"
@@ -39,8 +51,17 @@ const server = http.createServer(async (req:http.IncomingMessage, res:http.Serve
     
             res.end(JSON.stringify(ApiRespone.StatusSuccessWithData("Succes update data user", user)));
             } catch (error) {
-                res.writeHead(404, {"Content-Type": "application/json"})
-                res.end(JSON.stringify(ApiRespone.StatusError(error as string))); 
+                const err = error as Error;
+                if(err.error === errBadRequest) {
+                    res.writeHead(400, {"Content-Type": "application/json"})
+                    return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+                } else if(err.error === errNotFound) {
+                    res.writeHead(404, {"Content-Type": "application/json"})
+                    return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+                } else if(err.error === errUserExists) {
+                    res.writeHead(200, {"Content-Type": "application/json"})
+                    return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+                }
             }
     } 
     // api for delete user by id "http://localhost:5000/api/users/1"
@@ -53,8 +74,17 @@ const server = http.createServer(async (req:http.IncomingMessage, res:http.Serve
     
             res.end(JSON.stringify(ApiRespone.StatusSuccessWithData("Succes delete user", user)));
             } catch (error) {
-                res.writeHead(404, {"Content-Type": "application/json"})
-                res.end(JSON.stringify(ApiRespone.StatusError(error as string))); 
+                const err = error as Error;
+                if(err.error === errBadRequest) {
+                    res.writeHead(400, {"Content-Type": "application/json"})
+                    return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+                } else if(err.error === errNotFound) {
+                    res.writeHead(404, {"Content-Type": "application/json"})
+                    return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+                } else if(err.error === errUserExists) {
+                    res.writeHead(200, {"Content-Type": "application/json"})
+                    return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+                }
             }
     } 
     // api for create user "http://localhost:5000/api/users"
@@ -66,8 +96,17 @@ const server = http.createServer(async (req:http.IncomingMessage, res:http.Serve
             res.writeHead(201, {"Content-Type": "application/json"})
             res.end(JSON.stringify(ApiRespone.StatusSuccessWithData("Succes create user", user)));
             } catch (error) {
-            res.writeHead(404, {"Content-Type": "application/json"})
-            res.end(JSON.stringify(ApiRespone.StatusError(error as string))); 
+            const err = error as Error;
+            if(err.error === errBadRequest) {
+                res.writeHead(400, {"Content-Type": "application/json"})
+                return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+            } else if(err.error === errNotFound) {
+                res.writeHead(404, {"Content-Type": "application/json"})
+                return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+            } else if(err.error === errUserExists) {
+                res.writeHead(200, {"Content-Type": "application/json"})
+                return res.end(JSON.stringify(ApiRespone.StatusError(err.message))); 
+            }
             }
     }
     else {
